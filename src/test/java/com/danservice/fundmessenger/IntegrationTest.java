@@ -1,7 +1,7 @@
 package com.danservice.fundmessenger;
 
-import com.danservice.fundmessenger.adapter.inbound.kafka.v1.dto.KafkaStreetOrderDTO;
-import com.danservice.fundmessenger.adapter.outbound.kafka.v1.dto.KafkaStreetOrderAckDTO;
+import com.danservice.fundmessenger.adapter.inbound.kafka.streetorder.v1.dto.KafkaStreetOrderDTO;
+import com.danservice.fundmessenger.adapter.outbound.kafka.streetorderack.v1.dto.KafkaStreetOrderAckDTO;
 import com.danservice.fundmessenger.service.StreetOrderClient;
 import lombok.SneakyThrows;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -9,7 +9,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.danservice.fundmessenger.adapter.inbound.kafka.v1.dto;
+package com.danservice.fundmessenger.adapter.inbound.kafka.streetorder.v1.dto;
 
 import com.danservice.fundmessenger.domain.OrderType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

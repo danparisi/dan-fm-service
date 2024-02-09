@@ -1,8 +1,8 @@
 package com.danservice.fundmessenger.service;
 
 import com.danservice.fundmessenger.adapter.KafkaStreetOrderMapper;
-import com.danservice.fundmessenger.adapter.inbound.kafka.v1.dto.KafkaStreetOrderDTO;
-import com.danservice.fundmessenger.adapter.outbound.kafka.v1.KafkaProducer;
+import com.danservice.fundmessenger.adapter.inbound.kafka.streetorder.v1.dto.KafkaStreetOrderDTO;
+import com.danservice.fundmessenger.adapter.outbound.kafka.streetorderack.v1.KafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

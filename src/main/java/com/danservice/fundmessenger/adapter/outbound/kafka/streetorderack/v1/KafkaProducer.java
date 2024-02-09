@@ -1,6 +1,6 @@
-package com.danservice.fundmessenger.adapter.outbound.kafka.v1;
+package com.danservice.fundmessenger.adapter.outbound.kafka.streetorderack.v1;
 
-import com.danservice.fundmessenger.adapter.outbound.kafka.v1.dto.KafkaStreetOrderAckDTO;
+import com.danservice.fundmessenger.adapter.outbound.kafka.streetorderack.v1.dto.KafkaStreetOrderAckDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;

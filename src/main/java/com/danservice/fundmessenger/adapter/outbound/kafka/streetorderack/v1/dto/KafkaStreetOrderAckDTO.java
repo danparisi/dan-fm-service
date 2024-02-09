@@ -1,4 +1,4 @@
-package com.danservice.fundmessenger.adapter.outbound.kafka.v1.dto;
+package com.danservice.fundmessenger.adapter.outbound.kafka.streetorderack.v1.dto;
 
 import com.danservice.fundmessenger.domain.OrderType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -29,17 +29,5 @@ public class KafkaStreetOrderAckDTO {
     private UUID id;
     @NotNull
     private UUID streetId;
-    @NotNull
-    private OrderType type;
-
-    @Min(0)
-    @NotNull
-    private int quantity;
-    @NotNull
-    @DecimalMin("0.0001")
-    private BigDecimal price;
-    @NotEmpty
-    @Size(min = 1, max = 20)
-    private String instrument;
 
 }
