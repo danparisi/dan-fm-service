@@ -8,6 +8,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.jeasy.random.EasyRandom;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +28,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.danservice.fundmessenger.domain.OrderType.LIMIT;
-import static java.lang.Thread.sleep;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.UUID.randomUUID;
+import static kafka.utils.TestUtils.randomString;
 import static org.apache.commons.collections4.IterableUtils.toList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
@@ -41,7 +42,7 @@ import static org.springframework.kafka.test.utils.KafkaTestUtils.consumerProps;
 import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
 
 @SpringBootTest(classes = Application.class)
-@EmbeddedKafka(partitions = 1, topics = {"${dan.topic.street-order-ack}"})
+@EmbeddedKafka(partitions = 3, topics = {"${dan.topic.street-order-ack}", "${dan.topic.street-order-execution}"})
 class IntegrationTest {
     private static final UUID A_STREET_ID = randomUUID();
     private static final EasyRandom EASY_RANDOM = new EasyRandom();
@@ -51,6 +52,8 @@ class IntegrationTest {
     private String streetOrdersTopic;
     @Value("${dan.topic.street-order-ack}")
     private String streetOrderAcksTopic;
+    @Value("${dan.topic.street-order-execution}")
+    private String streetOrderExecutionsTopic;
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
     @Autowired
@@ -68,6 +71,7 @@ class IntegrationTest {
         kafkaTemplate.send(streetOrdersTopic, streetOrderDTO.getId().toString(), streetOrderDTO).get();
 
         verifyKafkaStreetOrderProduced(streetOrderDTO);
+        verifyKafkaOrderExecutionProduced(streetOrderDTO);
     }
 
     private static KafkaStreetOrderDTO aKafkaStreetOrderDTO() {
@@ -92,14 +96,17 @@ class IntegrationTest {
                 .isEqualTo(streetOrderDTO);
     }
 
+    private void verifyKafkaOrderExecutionProduced(KafkaStreetOrderDTO streetOrderDTO) {
+        List<ConsumerRecord<String, UUID>> consumerRecords = consumeFromKafkaOrderExecutionTopic();
+
+        assertEquals(1, consumerRecords.size());
+        UUID actual = consumerRecords.get(0).value();
+
+        assertEquals(streetOrderDTO.getId(), actual);
+    }
+
     private List<ConsumerRecord<String, KafkaStreetOrderAckDTO>> consumeFromKafkaStreetOrderAckTopic() {
-        Map<String, Object> consumerProps = consumerProps("test-group", "true", embeddedKafkaBroker);
-        consumerProps.put(TRUSTED_PACKAGES, "com.danservice.*");
-        consumerProps.put(AUTO_OFFSET_RESET_CONFIG, "earliest");
-        consumerProps.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerProps.put(VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        ConsumerFactory<String, KafkaStreetOrderAckDTO> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
-        Consumer<String, KafkaStreetOrderAckDTO> consumer = cf.createConsumer();
+        Consumer<String, KafkaStreetOrderAckDTO> consumer = createKafkaConsumer(KafkaStreetOrderAckDTO.class);
 
         embeddedKafkaBroker
                 .consumeFromAnEmbeddedTopic(consumer, streetOrderAcksTopic);
@@ -107,5 +114,28 @@ class IntegrationTest {
         return toList(
                 getRecords(consumer, Duration.of(30, SECONDS))
                         .records(streetOrderAcksTopic));
+    }
+
+    private List<ConsumerRecord<String, UUID>> consumeFromKafkaOrderExecutionTopic() {
+        Consumer<String, UUID> consumer = createKafkaConsumer(UUID.class);
+
+        embeddedKafkaBroker
+                .consumeFromAnEmbeddedTopic(consumer, streetOrderExecutionsTopic);
+
+        return toList(
+                getRecords(consumer, Duration.of(30, SECONDS))
+                        .records(streetOrderExecutionsTopic));
+    }
+
+    @NotNull
+    private <T> Consumer<String, T> createKafkaConsumer(Class<T> clazz) {
+        Map<String, Object> consumerProps = consumerProps("test-group-" + randomString(5), "true", embeddedKafkaBroker);
+        consumerProps.put(TRUSTED_PACKAGES, "com.danservice.*");
+        consumerProps.put(AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumerProps.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        consumerProps.put(VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        ConsumerFactory<String, T> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
+
+        return cf.createConsumer();
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class KafkaProducer {
+public class KafkaStreetOrderAckProducer {
     @Value("${dan.topic.street-order-ack}")
     private String streetOrderAcksTopic;
     private final KafkaTemplate<String, Object> kafkaTemplate;

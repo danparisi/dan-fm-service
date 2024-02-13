@@ -19,3 +19,5 @@ dan:
   topic:
     street-order: dan-street-orders
     street-order-ack: dan-street-order-acks
+    street-order-execution: dan-street-order-executions
+    int-fund-messenger-execution: int-fund-messenger-execution

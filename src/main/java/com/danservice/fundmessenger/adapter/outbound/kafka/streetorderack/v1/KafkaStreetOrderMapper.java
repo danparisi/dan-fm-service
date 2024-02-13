@@ -1,4 +1,4 @@
-package com.danservice.fundmessenger.adapter;
+package com.danservice.fundmessenger.adapter.outbound.kafka.streetorderack.v1;
 
 
 import com.danservice.fundmessenger.adapter.inbound.kafka.streetorder.v1.dto.KafkaStreetOrderDTO;
