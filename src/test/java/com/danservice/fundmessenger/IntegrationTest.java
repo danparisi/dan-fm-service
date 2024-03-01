@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -38,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.kafka.support.serializer.JsonDeserializer.TRUSTED_PACKAGES;
+import static org.springframework.kafka.support.serializer.JsonDeserializer.TYPE_MAPPINGS;
 import static org.springframework.kafka.test.utils.KafkaTestUtils.consumerProps;
 import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
 
@@ -54,6 +56,8 @@ class IntegrationTest {
     private String streetOrderAcksTopic;
     @Value("${dan.topic.street-order-execution}")
     private String streetOrderExecutionsTopic;
+    @Autowired
+    private KafkaProperties kafkaProperties;
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
     @Autowired
@@ -130,10 +134,12 @@ class IntegrationTest {
     @NotNull
     private <T> Consumer<String, T> createKafkaConsumer(Class<T> clazz) {
         Map<String, Object> consumerProps = consumerProps("test-group-" + randomString(5), "true", embeddedKafkaBroker);
-        consumerProps.put(TRUSTED_PACKAGES, "com.danservice.*");
+        consumerProps.put(TRUSTED_PACKAGES, "*");
         consumerProps.put(AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        consumerProps.put(TYPE_MAPPINGS, kafkaProperties.getProducer().getProperties().get(TYPE_MAPPINGS));
+
         ConsumerFactory<String, T> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
 
         return cf.createConsumer();

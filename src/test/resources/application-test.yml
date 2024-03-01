@@ -1,3 +1,5 @@
+debug: true
+
 spring:
   kafka:
     consumer:
