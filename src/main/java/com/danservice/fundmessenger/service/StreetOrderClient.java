@@ -18,7 +18,7 @@ public class StreetOrderClient {
     @SneakyThrows
     public UUID processStreetOrder(KafkaStreetOrderDTO streetOrderDTO) {
         log.info("Processing street order id=[{}]", streetOrderDTO.getId());
-        sleep(new Random().nextInt(100, 600));
+        sleep(new Random().nextInt(0, 300));
 
         return randomUUID();
     }

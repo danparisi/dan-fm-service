@@ -39,7 +39,7 @@ public class OrderService {
     @SneakyThrows
     public void handleOrderExecution(UUID orderId) {
         log.info("Order Executed: id=[{}]", orderId);
-        sleep(new Random().nextInt(500, 1000));
+        sleep(new Random().nextInt(100, 500));
 
         kafkaOrderExecutionProducer.sendOrderExecution(orderId);
     }
